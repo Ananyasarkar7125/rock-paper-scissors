@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""
+Simple Rock-Paper-Scissors CLI game.
+
+Usage: run `python3 rps.py` and follow prompts. Type 'quit' to exit.
+"""
+import random
+import sys
+
+VALID_CHOICES = {
+    'rock': 'rock',
+    'r': 'rock',
+    'paper': 'paper',
+    'p': 'paper',
+    'scissors': 'scissors',
+    's': 'scissors',
+}
+
+FULL_NAMES = ['rock', 'paper', 'scissors']
+
+
+def determine_winner(player_choice: str, computer_choice: str) -> str:
+    """Return 'player', 'computer', or 'tie' depending on who wins.
+
+    The function expects both inputs to be full names: 'rock', 'paper', or 'scissors'.
+    """
+    if player_choice == computer_choice:
+        return 'tie'
+
+    # rock beats scissors, scissors beats paper, paper beats rock
+    rules = {
+        'rock': 'scissors',
+        'scissors': 'paper',
+        'paper': 'rock',
+    }
+    if rules[player_choice] == computer_choice:
+        return 'player'
+    else:
+        return 'computer'
+
+
+def parse_input(text: str) -> str:
+    """Parse user input and return canonical full name or raise ValueError.
+
+    Accepts 'rock', 'paper', 'scissors' or 'r','p','s'.
+    """
+    text_clean = text.strip().lower()
+    if text_clean in VALID_CHOICES:
+        return VALID_CHOICES[text_clean]
+    raise ValueError("Invalid choice: must be 'rock', 'paper', 'scissors' (or r/p/s) or 'quit'.")
+
+
+def main():
+    player_wins = 0
+    computer_wins = 0
+    ties = 0
+    rounds = 0
+
+    print("Welcome to Rock Paper Scissors! Type 'quit' to exit. (You can use 'r', 'p', 's')")
+
+    try:
+        while True:
+            raw = input("Your move (rock/paper/scissors): ")
+            if raw is None:
+                break
+            if raw.strip().lower() in ('quit', 'q', 'exit'):
+                print("Exiting game. Thanks for playing!")
+                break
+
+            try:
+                player_move = parse_input(raw)
+            except ValueError as e:
+                print(f"{e}")
+                continue
+
+            computer_move = random.choice(FULL_NAMES)
+            rounds += 1
+
+            outcome = determine_winner(player_move, computer_move)
+            if outcome == 'player':
+                player_wins += 1
+                result = 'You win!'
+            elif outcome == 'computer':
+                computer_wins += 1
+                result = 'Computer wins!'
+            else:
+                ties += 1
+                result = "It's a tie!"
+
+            print(f"You chose {player_move}, computer chose {computer_move}. {result}")
+            print(f"Score: You {player_wins} — Computer {computer_wins} — Ties {ties} (Rounds: {rounds})")
+            print()
+
+    except (KeyboardInterrupt, EOFError):
+        print("\nInput ended. Exiting.")
+
+    # Final scoreboard
+    print("Final results:")
+    print(f"Rounds played: {rounds}")
+    print(f"Player wins: {player_wins}")
+    print(f"Computer wins: {computer_wins}")
+    print(f"Ties: {ties}")
+
+
+if __name__ == '__main__':
+    main()
